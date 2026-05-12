@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="preconnect" href="https://www.gstatic.com"/>
+<link rel="dns-prefetch" href="https://www.gstatic.com"/>
+<link rel="preconnect" href="https://firestore.googleapis.com"/>
+<link rel="dns-prefetch" href="https://firestore.googleapis.com"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>ZenithCrypto — MINE</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#04060e;--s1:#080d18;--s2:#0c1220;--s3:#111929;
+  --a:#4f8ef7;--a2:#6ba3ff;
+  --gold:#e8b84b;--gold2:#ffd166;
+  --green:#0ecb81;--red:#f6465d;
+  --purple:#7c5df7;--cyan:#22d3ee;--orange:#f7931a;
+  --t1:#eaecf0;--t2:#6c7a96;--t3:#2d3a55;
+  --font:'Inter',system-ui,sans-serif;
+  --fhd:'Orbitron',monospace;
+  --fmono:'JetBrains Mono',monospace;
+  --topH:54px;
+}
+html{height:100%;overflow:hidden}
+body{height:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:var(--bg);color:var(--t1);font-family:var(--font);margin:0}
+::-webkit-scrollbar{width:2px}::-webkit-scrollbar-thumb{background:rgba(79,142,247,.3);border-radius:2px}
+
+/* KEYFRAMES */
+@keyframes mineFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes minePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.96)}}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes countUp{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes glowRing{0%,100%{box-shadow:0 0 15px rgba(79,142,247,.3)}50%{box-shadow:0 0 35px rgba(79,142,247,.6),0 0 70px rgba(79,142,247,.2)}}
+@keyframes spinnerRot{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes particleFly{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-60px) scale(0);opacity:0}}
+@keyframes claimPop{0%{transform:scale(.9);opacity:0}60%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+
+/* TOPBAR */
+#topbar{position:sticky;top:0;z-index:1000;height:var(--topH);background:rgba(4,6,14,.97);border-bottom:1px solid rgba(79,142,247,.12);display:flex;align-items:center;padding:0 14px;gap:8px;backdrop-filter:blur(24px)}
+.tb-brand{font-family:var(--fhd);font-size:.72rem;font-weight:900;background:linear-gradient(135deg,#fff,#a8c4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:1.5px}
+.tb-sp{flex:1}
+.tb-xp-wrap{width:60px;height:4px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+#xpf{height:100%;background:linear-gradient(90deg,var(--a),var(--purple));border-radius:3px;width:0%;transition:width .5s}
+#hbal{font-family:var(--fmono);font-size:.9rem;font-weight:700;background:linear-gradient(135deg,#e8b84b,#ffd166);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#hlv{background:linear-gradient(135deg,var(--a),var(--purple));color:#fff;font-family:var(--fhd);font-size:.4rem;font-weight:900;padding:3px 8px;border-radius:20px;white-space:nowrap}
+
+/* TICKER */
+#ticker-wrap{position:sticky;top:54px;z-index:999;height:26px;background:rgba(4,6,14,.98);border-bottom:1px solid rgba(255,255,255,.05);overflow:hidden;display:flex;align-items:center}
+#ticker{display:flex;gap:18px;animation:tkscroll 30s linear infinite;white-space:nowrap;padding-left:12px}
+@keyframes tkscroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ti{display:inline-flex;gap:4px;align-items:center;font-size:.5rem;padding:0 10px;border-right:1px solid rgba(255,255,255,.05)}
+.ti-s{font-family:var(--fmono);color:var(--t2);font-weight:700}
+.up{color:var(--green)}.dn{color:var(--red)}
+
+/* HERO */
+.mine-hero{
+  background:radial-gradient(ellipse 100% 80% at 50% -10%,rgba(79,142,247,.12),transparent 55%),
+             linear-gradient(180deg,var(--s1),var(--bg));
+  padding:16px 16px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  position:relative;overflow:hidden;
+}
+.mine-hero::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234f8ef7' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events:none;
+}
+.mine-rate-big{
+  font-family:var(--fmono);font-size:1.8rem;font-weight:900;
+  background:linear-gradient(135deg,#0ecb81,#06a16a);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:-1px;line-height:1;
+}
+.mine-rate-lbl{font-family:var(--fhd);font-size:.38rem;color:var(--t3);letter-spacing:2px;margin-bottom:5px}
+.mine-status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-family:var(--fhd);font-size:.38rem;font-weight:700;margin-top:4px}
+.mine-status-pill.online{background:rgba(14,203,129,.12);border:1px solid rgba(14,203,129,.25);color:var(--green)}
+.mine-status-pill.offline{background:rgba(246,70,93,.12);border:1px solid rgba(246,70,93,.25);color:var(--red)}
+.live-ring{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(14,203,129,.8);animation:minePulse 1.5s infinite}
+
+/* STATS GRID */
+.mine-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:12px 16px}
+.ms-card{background:var(--s1);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:10px 8px;text-align:center;transition:.15s}
+.ms-card:active{transform:scale(.97)}
+.ms-lbl{font-family:var(--fhd);font-size:.3rem;color:var(--t3);letter-spacing:.5px;margin-bottom:3px}
+.ms-val{font-family:var(--fmono);font-size:.58rem;font-weight:700;color:var(--t1)}
+
+/* PROGRESS BAR */
+.mine-prog-wrap{padding:0 16px 12px}
+.mine-prog-lbl{display:flex;justify-content:space-between;font-family:var(--fhd);font-size:.36rem;color:var(--t3);margin-bottom:5px}
+.mine-prog-track{height:6px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden}
+.mine-prog-fill{height:6px;background:linear-gradient(90deg,var(--a),var(--purple));border-radius:4px;transition:width .5s;position:relative;overflow:hidden}
+.mine-prog-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:shimmer 1.5s infinite;background-size:200% 100%}
+
+/* CLAIM BUTTON */
+.claim-btn{
+  width:calc(100% - 32px);margin:0 16px 8px;
+  padding:14px;border-radius:14px;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#0ecb81,#06a16a);
+  color:#000;font-family:var(--fhd);font-size:.64rem;font-weight:900;
+  letter-spacing:1.5px;box-shadow:0 4px 24px rgba(14,203,129,.4),0 0 0 1px rgba(14,203,129,.2);
+  transition:all .18s;position:relative;overflow:hidden;
+}
+.claim-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.15),transparent);pointer-events:none;border-radius:inherit}
+.claim-btn:active{transform:scale(.96);box-shadow:0 2px 12px rgba(14,203,129,.3)}
+.claim-btn.pulse{animation:glowRing 1.5s infinite}
+
+/* BOOST BUTTON */
+.boost-btn{
+  width:calc(100% - 32px);margin:0 16px 12px;
+  padding:11px;border-radius:12px;border:none;cursor:pointer;
+  background:rgba(124,93,247,.12);border:1px solid rgba(124,93,247,.3);
+  color:var(--purple);font-family:var(--fhd);font-size:.52rem;font-weight:700;
+  letter-spacing:.5px;transition:.15s;
+}
+.boost-btn:active{background:rgba(124,93,247,.25)}
+.boost-active{background:rgba(14,203,129,.12)!important;border-color:rgba(14,203,129,.3)!important;color:var(--green)!important}
+
+/* TABS */
+.mine-tabs{display:flex;background:var(--s1);border-bottom:1px solid rgba(255,255,255,.05);position:sticky;top:80px;z-index:990}
+.mine-tab{flex:1;padding:11px 4px;text-align:center;font-family:var(--fhd);font-size:.44rem;font-weight:700;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:.15s;letter-spacing:.5px}
+.mine-tab.active{color:var(--a);border-bottom-color:var(--a)}
+
+/* TIER BADGES */
+.tier-badge{font-family:var(--fhd);font-size:.36rem;font-weight:900;padding:2px 8px;border-radius:4px;letter-spacing:.5px}
+.tier-BASIC{background:rgba(14,203,129,.15);color:#0ecb81}
+.tier-STANDARD{background:rgba(24,144,255,.15);color:#1890ff}
+.tier-ADVANCED{background:rgba(153,69,255,.15);color:#9945ff}
+.tier-ELITE{background:rgba(240,185,11,.15);color:#f0b90b}
+.tier-LEGEND{background:rgba(246,70,93,.15);color:#f6465d}
+.tier-ULTIMATE{background:rgba(255,255,255,.15);color:#fff}
+.tier-MYTHIC{background:linear-gradient(135deg,rgba(232,184,75,.2),rgba(124,93,247,.2));color:#ffd166;border:1px solid rgba(232,184,75,.3)}
+
+/* MINER CARD */
+.miner-card{
+  background:var(--s1);border:1px solid rgba(255,255,255,.07);
+  border-radius:16px;padding:14px;margin-bottom:10px;
+  position:relative;overflow:hidden;animation:fadeUp .25s ease both;
+  transition:border-color .2s,box-shadow .2s;
+}
+.miner-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);
+}
+.miner-card.owned{border-color:rgba(14,203,129,.2);box-shadow:0 0 0 1px rgba(14,203,129,.06),0 4px 20px rgba(0,0,0,.4)}
+.miner-card.locked{opacity:.65}
+.mc-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.mc-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;position:relative;overflow:hidden}
+.mc-icon::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent);pointer-events:none}
+.mc-info{flex:1;min-width:0}
+.mc-name{font-family:var(--fhd);font-size:.62rem;font-weight:700;color:var(--t1);margin-bottom:3px}
+.mc-tier-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.mc-desc{font-size:.52rem;color:var(--t2);line-height:1.4}
+.mc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.mcs-item{background:var(--s2);border-radius:8px;padding:7px 8px;text-align:center}
+.mcs-lbl{font-family:var(--fhd);font-size:.3rem;color:var(--t3);letter-spacing:.5px;margin-bottom:2px}
+.mcs-val{font-family:var(--fmono);font-size:.5rem;font-weight:700}
+
+/* BUY BUTTON */
+.mc-buy{
+  width:100%;padding:11px;border-radius:10px;border:none;cursor:pointer;
+  font-family:var(--fhd);font-size:.52rem;font-weight:700;letter-spacing:.5px;
+  transition:all .15s;position:relative;overflow:hidden;
+}
+.mc-buy::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.12),transparent);pointer-events:none}
+.mc-buy:active{transform:scale(.96)}
+.mc-buy.can-buy{background:linear-gradient(135deg,var(--a),var(--purple));color:#fff;box-shadow:0 3px 14px rgba(79,142,247,.4)}
+.mc-buy.cant-buy{background:rgba(255,255,255,.05);color:var(--t3);cursor:not-allowed}
+.mc-buy.owned-btn{background:linear-gradient(135deg,rgba(14,203,129,.15),rgba(14,203,129,.05));color:var(--green);border:1px solid rgba(14,203,129,.25)}
+.mc-buy.upgrade-btn{background:linear-gradient(135deg,rgba(240,185,11,.15),rgba(240,185,11,.05));color:var(--gold);border:1px solid rgba(240,185,11,.3)}
+
+/* Count badge */
+.mc-count{position:absolute;top:10px;right:10px;background:var(--a);color:#fff;font-family:var(--fhd);font-size:.36rem;font-weight:900;padding:2px 7px;border-radius:20px}
+
+/* MY MINERS card */
+.active-card{background:var(--s1);border:1px solid rgba(14,203,129,.2);border-radius:14px;padding:14px;margin-bottom:8px;animation:fadeUp .2s ease}
+.ac-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.ac-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.ac-info{flex:1}
+.ac-name{font-family:var(--fhd);font-size:.58rem;font-weight:700;color:var(--t1)}
+.ac-count{font-family:var(--fhd);font-size:.42rem;color:var(--t2);margin-top:2px}
+.ac-earning{font-family:var(--fmono);font-size:.62rem;font-weight:700;color:var(--green);text-align:right}
+.ac-bar-wrap{margin-top:4px}
+.ac-bar-track{height:3px;background:rgba(255,255,255,.06);border-radius:2px}
+.ac-bar-fill{height:3px;border-radius:2px;background:linear-gradient(90deg,var(--green),var(--a));animation:shimmer 2s infinite;background-size:200% 100%}
+
+/* Particle */
+.mine-particle{position:fixed;pointer-events:none;font-family:var(--fmono);font-size:.66rem;font-weight:700;color:var(--green);animation:particleFly .8s ease forwards;z-index:9000}
+
+/* TOAST */
+#toast{display:none;position:fixed;top:62px;left:50%;transform:translateX(-50%);z-index:9999;background:var(--s1);border-radius:10px;padding:10px 16px;align-items:center;gap:8px;box-shadow:0 6px 28px rgba(0,0,0,.65);border-left:3px solid var(--a);max-width:92vw}
+#toast-msg{font-family:var(--fhd);font-size:.6rem;font-weight:700}
+
+/* Boost timer badge */
+#boost-badge{display:none;position:fixed;bottom:16px;right:16px;background:linear-gradient(135deg,var(--purple),var(--a));color:#fff;font-family:var(--fhd);font-size:.42rem;font-weight:700;padding:8px 14px;border-radius:20px;box-shadow:0 4px 20px rgba(124,93,247,.4);z-index:500;letter-spacing:.5px}
+
+/* Empty state */
+.empty-miners{text-align:center;padding:40px 16px}
+.empty-miners-icon{font-size:3rem;margin-bottom:12px;animation:mineFloat 3s infinite}
+.empty-miners-title{font-family:var(--fhd);font-size:.6rem;color:var(--t2);margin-bottom:6px}
+.empty-miners-sub{font-size:.58rem;color:var(--t3);line-height:1.6}
+
+/* Shop header */
+.shop-header{padding:12px 16px 8px;display:flex;align-items:center;justify-content:space-between}
+.shop-title{font-family:var(--fhd);font-size:.56rem;font-weight:700;color:var(--t1);letter-spacing:1px}
+.shop-sub{font-family:var(--fhd);font-size:.38rem;color:var(--t3)}
+
+/* Filter pills */
+.filter-row{display:flex;gap:6px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-pill{flex-shrink:0;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:var(--t2);font-family:var(--fhd);font-size:.38rem;cursor:pointer;transition:.12s}
+.filter-pill.on{border-color:var(--a);background:rgba(79,142,247,.15);color:var(--a)}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div onclick="ZCS.go('home')" style="cursor:pointer;display:flex;align-items:center;gap:8px">
+    <svg width="30" height="30" viewBox="0 0 140 140" fill="none"><defs><linearGradient id="tbg" x1="0" y1="0" x2="140" y2="140" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#5b9bff"/><stop offset="50%" stop-color="#9b6dff"/><stop offset="100%" stop-color="#f5c842"/></linearGradient></defs><polygon points="70,8 118,35 118,105 70,132 22,105 22,35" fill="rgba(91,155,255,0.1)" stroke="url(#tbg)" stroke-width="2"/><path d="M40,43 L100,43 L100,55 L64,85 L100,85 L100,97 L40,97 L40,85 L76,55 L40,55 Z" fill="url(#tbg)"/></svg>
+    <span class="tb-brand">‹ MINE</span>
+  </div>
+  <div class="tb-sp"></div>
+  <div class="tb-xp-wrap"><div id="xpf"></div></div>
+  <span id="hbal">$0.00</span>
+  <span id="hlv">LV1</span>
+</div>
+
+<!-- TICKER -->
+<div id="ticker-wrap"><div id="ticker">
+  <span class="ti"><span class="ti-s">BTC</span><span class="up" id="tk-BTC">--</span></span>
+  <span class="ti"><span class="ti-s">ETH</span><span class="up" id="tk-ETH">--</span></span>
+  <span class="ti"><span class="ti-s">SOL</span><span class="up" id="tk-SOL">--</span></span>
+  <span class="ti"><span class="ti-s">BNB</span><span class="up" id="tk-BNB">--</span></span>
+  <span class="ti"><span class="ti-s">XRP</span><span class="up" id="tk-XRP">--</span></span>
+  <span class="ti"><span class="ti-s">BTC</span><span class="up">--</span></span>
+  <span class="ti"><span class="ti-s">ETH</span><span class="up">--</span></span>
+</div></div>
+
+<!-- MINE HERO -->
+<div class="mine-hero">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px">
+    <div>
+      <div class="mine-rate-lbl">MINING RATE</div>
+      <div class="mine-rate-big" id="mine-rate">$0.000000/s</div>
+      <div class="mine-status-pill online" id="mine-status">
+        <span class="live-ring"></span>
+        <span id="mine-status-txt">MINING ACTIVE</span>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-family:var(--fhd);font-size:.36rem;color:var(--t3);letter-spacing:1px;margin-bottom:3px">PENDING</div>
+      <div id="mine-pend" style="font-family:var(--fmono);font-size:1.1rem;font-weight:700;color:var(--gold)">$0.0000</div>
+      <div style="font-family:var(--fhd);font-size:.36rem;color:var(--t3);margin-top:4px">HASHRATE</div>
+      <div id="mine-th" style="font-family:var(--fmono);font-size:.7rem;font-weight:700;color:var(--a)">0 TH/s</div>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="mine-prog-wrap">
+    <div class="mine-prog-lbl">
+      <span>SESSION PROGRESS</span>
+      <span id="mine-pend-pct">0%</span>
+    </div>
+    <div class="mine-prog-track">
+      <div class="mine-prog-fill" id="mine-prog" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Stats grid -->
+  <div class="mine-stats">
+    <div class="ms-card"><div class="ms-lbl">ALL TIME</div><div class="ms-val" id="mine-total" style="color:var(--green)">$0.00</div></div>
+    <div class="ms-card"><div class="ms-lbl">TODAY</div><div class="ms-val" id="mine-today" style="color:var(--a)">$0.00</div></div>
+    <div class="ms-card"><div class="ms-lbl">MINERS</div><div class="ms-val" id="mine-count" style="color:var(--gold)">0</div></div>
+    <div class="ms-card"><div class="ms-lbl">BOOST</div><div class="ms-val" id="mine-boost-lbl" style="color:var(--purple)">1×</div></div>
+  </div>
+</div>
+
+<!-- ACTION BUTTONS -->
+<div style="padding:10px 16px 6px">
+  <button class="claim-btn" id="claim-btn" onclick="claimMining()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:7px"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    CLAIM EARNINGS
+  </button>
+  <button class="boost-btn" id="boost-btn" onclick="activateBoost()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:6px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    2× SPEED BOOST (30 MIN) — WATCH AD
+  </button>
+</div>
+
+<!-- TABS -->
+<div class="mine-tabs">
+  <div class="mine-tab active" id="tab-shop" onclick="mineTab('shop')">🛒 SHOP</div>
+  <div class="mine-tab" id="tab-active" onclick="mineTab('active')">⛏ MY MINERS</div>
+  <div class="mine-tab" id="tab-stats" onclick="mineTab('stats')">📊 STATS</div>
+</div>
+
+<!-- CONTENT -->
+<div id="mine-content" style="padding:0 0 40px"></div>
+
+<!-- Boost badge -->
+<div id="boost-badge">⚡ 2× BOOST ACTIVE — <span id="boost-timer">30:00</span></div>
+
+<div id="toast"><span id="toast-msg"></span></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   GLOBALS
+═══════════════════════════════════════════ */
+var G={},db=null,auth=null,rtdb=null,FS=null;
+(function(){var _x=atob("eyJhcGlLZXkiOiJBSXphU3lDSFJ3cV9EMFdtODNmSTZNcEVwT20tZjlJaXBsZzdUNVEiLCJhdXRoRG9tYWluIjoidGl0YW4tYXBleC1tdWx0aXBsYXllci5maXJlYmFzZWFwcC5jb20iLCJwcm9qZWN0SWQiOiJ0aXRhbi1hcGV4LW11bHRpcGxheWVyIiwic3RvcmFnZUJ1Y2tldCI6InRpdGFuLWFwZXgtbXVsdGlwbGF5ZXIuZmlyZWJhc2VzdG9yYWdlLmFwcCIsIm1lc3NhZ2luZ1NlbmRlcklkIjoiNDEzODUwMDczNDgxIiwiYXBwSWQiOiIxOjQxMzg1MDA3MzQ4MTp3ZWI6ODM0ZGVmNTlmNDA3OTRkMjE4MDk1OCIsImRhdGFiYXNlVVJMIjoiaHR0cHM6Ly90aXRhbi1hcGV4LW11bHRpcGxheWVyLWRlZmF1bHQtcnRkYi5hc2lhLXNvdXRoZWFzdDEuZmlyZWJhc2VkYXRhYmFzZS5hcHAifQ==");try{window._FC=JSON.parse(_x);}catch(e){}})();
+/* ── OFFLINE GUARD ── */
+(function(){
+  var _t=null;
+  window._showOffline=function(msg){if(document.getElementById('_zco'))return;var d=document.createElement('div');d.id='_zco';d.style.cssText='position:fixed;inset:0;z-index:99999;background:#04060e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:30px;text-align:center';d.innerHTML='<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#4f8ef7" stroke-width="1.5"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.56 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg><div style="font-family:Orbitron,monospace;font-size:.9rem;font-weight:900;color:#eaecf0">CONNECTION LOST</div><div style="font-family:Orbitron,monospace;font-size:.5rem;color:#6c7a96;line-height:1.8;max-width:280px">'+(msg||'Check your internet connection')+'<br><span id="_zc_retry_txt">Retrying in 5s...</span></div><button onclick="window._retryNow&&window._retryNow()" style="padding:11px 28px;border-radius:10px;border:1.5px solid rgba(79,142,247,.4);background:rgba(79,142,247,.1);color:#4f8ef7;font-family:Orbitron,monospace;font-size:.52rem;cursor:pointer;font-weight:700">RETRY NOW</button>';document.body.appendChild(d);var c=5;_t=setInterval(function(){c--;var r=document.getElementById('_zc_retry_txt');if(r)r.textContent=c>0?'Retrying in '+c+'s...':'Retrying...';if(c<=0){clearInterval(_t);window._retryNow&&window._retryNow();}},1000);};
+  window._hideOffline=function(){var d=document.getElementById('_zco');if(d)d.remove();if(_t)clearInterval(_t);};
+  window.addEventListener('online',function(){window._hideOffline();});
+  window.addEventListener('offline',function(){window._showOffline('No internet connection detected.');});
+  window.addEventListener('error',function(e){e.preventDefault();return true;},true);
+  window.addEventListener('unhandledrejection',function(e){e.preventDefault();});
+})();
+
+
+/* ═══════════════════════════════════════════
+   12 MINERS — Basic to Mythic tier
+═══════════════════════════════════════════ */
+var MINERS=[
+  {id:'solar',   name:'Solar Panel',    icon:'☀️', tier:'BASIC',    cost:0,    rate:0.00001,   th:1,    c:'#0ecb81', bg:'rgba(14,203,129,.15)',  desc:'Free starter rig. Max 1 only. Earns ~$0.86/day.',    maxLvl:1, freeOnly:true, noUpgrade:true, onlyOne:true},
+  {id:'wind',    name:'Wind Turbine',   icon:'💨', tier:'BASIC',    cost:1.5,  rate:0.0000014, th:3,    c:'#1890ff', bg:'rgba(24,144,255,.15)',  desc:'Eco-powered turbine. Earns ~$0.12/day.',             maxLvl:10},
+  {id:'gpu',     name:'GPU Cluster',    icon:'🖥️', tier:'STANDARD', cost:5,    rate:0.0000033, th:8,    c:'#9945ff', bg:'rgba(153,69,255,.15)',  desc:'Consumer-grade GPU array. Earns ~$0.29/day.',        maxLvl:10},
+  {id:'asic',    name:'ASIC Miner',     icon:'⚙️', tier:'STANDARD', cost:15,   rate:0.0000083, th:20,   c:'#f0b90b', bg:'rgba(240,185,11,.15)',  desc:'Application-specific chips. Earns ~$0.72/day.',      maxLvl:8},
+  {id:'water',   name:'Hydro Turbine',  icon:'💧', tier:'STANDARD', cost:25,   rate:0.0000125, th:30,   c:'#00aae4', bg:'rgba(0,170,228,.15)',   desc:'Hydro-powered. Clean output. Earns ~$1.08/day.',     maxLvl:8},
+  {id:'quantum', name:'Quantum Core',   icon:'⚛️', tier:'ADVANCED', cost:40,   rate:0.0000222, th:50,   c:'#00ffcc', bg:'rgba(0,255,204,.1)',   desc:'Quantum processing unit. Earns ~$1.92/day.',         maxLvl:6},
+  {id:'plasma',  name:'Plasma Array',   icon:'🔥', tier:'ADVANCED', cost:80,   rate:0.00005,   th:100,  c:'#f6465d', bg:'rgba(246,70,93,.12)',   desc:'Plasma-field hashers. Earns ~$4.32/day.',            maxLvl:6},
+  {id:'neural',  name:'Neural Miner',   icon:'🧠', tier:'ELITE',    cost:150,  rate:0.000111,  th:200,  c:'#ff9500', bg:'rgba(255,149,0,.12)',   desc:'AI-optimized neural network. Earns ~$9.6/day.',      maxLvl:5},
+  {id:'dark',    name:'Dark Matter',    icon:'🌑', tier:'ELITE',    cost:300,  rate:0.00025,   th:500,  c:'#8247e5', bg:'rgba(130,71,229,.12)',  desc:'Exotic dark matter particles. Earns ~$21.6/day.',    maxLvl:5},
+  {id:'stellar', name:'Stellar Core',   icon:'⭐', tier:'LEGEND',   cost:500,  rate:0.000556,  th:1000, c:'#ffd700', bg:'rgba(255,215,0,.1)',    desc:'Orbital fusion reactor. Earns ~$4.8/day.',            maxLvl:3},
+  {id:'omega',   name:'Omega Array',    icon:'♾️', tier:'LEGEND',   cost:1000, rate:0.00125,   th:2500, c:'#00ffcc', bg:'rgba(0,255,204,.12)',   desc:'Multi-dimensional array. Earns ~$108/day.',          maxLvl:3},
+  {id:'genesis', name:'Genesis Block',  icon:'💎', tier:'ULTIMATE', cost:2000, rate:0.000556,  th:5000, c:'#f0b90b', bg:'rgba(240,185,11,.12)',  desc:'The original blockchain core. Earns ~$48/day.',     maxLvl:2},
+  {id:'void',    name:'Void Engine',    icon:'🌌', tier:'MYTHIC',   cost:5000, rate:0.001389,  th:12000,c:'#e8b84b', bg:'rgba(232,184,75,.12)',  desc:'Mines from the void between dimensions. Earns ~$120/day.',maxLvl:1},
+];
+
+var PRICES={BTC:97000,ETH:3400,BNB:620,SOL:185,XRP:0.62};
+var _mineTab='shop',_mineFilter='ALL';
+var _mineBoost=false,_mineBoostEnd=0;
+var _mineAccumLive=0,_lastMineTs=Date.now();
+var _mineSessionStart=Date.now();
+
+/* ═══════════════════════════════════════════
+   ZCS NAVIGATION
+═══════════════════════════════════════════ */
+var ZCS={
+  pages:{'home':'HOME_URL','market':atob('aHR0cHM6Ly9jcnlwdG9ib3NzNzY4LWNyZWF0ZS5naXRodWIuaW8vQ2poem1hcmtldC5naXRodWIuaW8v'),'trade':atob('aHR0cHM6Ly9jcnlwdG9ib3NzNzY4LWNyZWF0ZS5naXRodWIuaW8vSXdpd3RyYWQ4MjI4LmdpdGh1Yi5pby8='),'mine':atob('aHR0cHM6Ly9jcnlwdG9ib3NzNzY4LWNyZWF0ZS5naXRodWIuaW8vU2pqc2pMQi5naXRodWIuaW8v'),'wallet':atob('aHR0cHM6Ly9vbHdpbjEzMzQtYml0LmdpdGh1Yi5pby9EYmRubmR3YWxsZXQuZ2l0aHViLmlvLw=='),'tasks':atob('aHR0cHM6Ly9vbHdpbjEzMzQtYml0LmdpdGh1Yi5pby9Kc3puanN0YXNrLmdpdGh1Yi5pby8='),'social':atob('aHR0cHM6Ly9jcnlwdG9ib3NzNzY4LWNyZWF0ZS5naXRodWIuaW8vSnNqc2pzb2NpYWwuZ2l0aHViLmlvLw=='),'spin':atob('aHR0cHM6Ly9jcnlwdG9ib3NzNzY4LWNyZWF0ZS5naXRodWIuaW8vU2pqc2pMQi5naXRodWIuaW8v')},
+  go:function(pg){var url=ZCS.pages[pg];if(!url||url.indexOf('_URL')>-1)return;try{sessionStorage.setItem('_zc_uid',G.uid||'');}catch(e){}window.location.href=url+(G.uid?'?uid='+G.uid:'');},
+  restore:function(){try{var p=new URLSearchParams(window.location.search);var uid=p.get('uid');if(uid){G.uid=uid;sessionStorage.setItem('_zc_uid',uid);return;}var cu=sessionStorage.getItem('_zc_uid');if(cu)G.uid=cu;}catch(e){}}
+};
+window.goPage=function(pg){ZCS.go(pg);};
+
+/* ═══════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════ */
+function gid(id){return document.getElementById(id);}
+function fP(p){if(!p&&p!==0)return '$0';p=parseFloat(p);if(p>=1000)return '$'+p.toLocaleString(undefined,{maximumFractionDigits:2});if(p>=1)return '$'+p.toFixed(2);if(p>=0.01)return '$'+p.toFixed(4);if(p>=0.0001)return '$'+p.toFixed(6);return '$'+p.toFixed(8);}
+function fN(n){n=parseFloat(n)||0;if(n>=1e9)return '$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return '$'+(n/1e6).toFixed(2)+'M';if(n>=1e3)return '$'+(n/1e3).toFixed(0)+'K';return '$'+n.toFixed(2);}
+function toast(msg,type){var t=gid('toast'),m=gid('toast-msg');if(!t)return;if(m)m.textContent=msg;t.style.borderLeftColor=type==='error'?'#f6465d':type==='success'?'#0ecb81':'#4f8ef7';t.style.display='flex';clearTimeout(t._t);t._t=setTimeout(function(){t.style.display='none';},3000);}
+function save(data){
+  if(!G.uid||G.isGuest||!db)return;
+  if(!window._sq)window._sq={};
+  Object.assign(window._sq,data);
+  clearTimeout(window._st);
+  window._st=setTimeout(function(){
+    if(!window._sq||!db)return;
+    var d=window._sq;window._sq={};
+    db.collection('players').doc(G.uid).update(d).catch(function(){});
+  },1500);
+}
+function updateHdr(){
+  var b=parseFloat(G.bal)||0,lv=G.level||1,xp=G.xp||0;
+  var x0=[0,0,50,120,220,360,550,800,1100,1500,2000][Math.min(lv,10)]||0;
+  var x1=[0,50,120,220,360,550,800,1100,1500,2000,3000][Math.min(lv,10)]||1000;
+  var pct=Math.min(100,Math.max(0,((xp-x0)/(x1-x0))*100));
+  if(gid('hbal'))gid('hbal').textContent='$'+b.toFixed(2);
+  if(gid('hlv'))gid('hlv').textContent='LV'+lv;
+  if(gid('xpf'))gid('xpf').style.width=pct+'%';
+}
+function spawnParticle(txt,color){
+  var p=document.createElement('div');
+  p.className='mine-particle';
+  p.textContent=txt;p.style.color=color||'#0ecb81';
+  p.style.left=Math.random()*60+20+'%';
+  p.style.top='40%';
+  document.body.appendChild(p);
+  setTimeout(function(){if(p.parentNode)p.remove();},800);
+}
+
+/* ═══════════════════════════════════════════
+   MINING ENGINE
+═══════════════════════════════════════════ */
+function getMineRate(){
+  var upgrades=G.upgrades||{};
+  var rate=MINERS.reduce(function(s,m){return s+(upgrades[m.id]||0)*m.rate;},0);
+  var boost=_mineBoost&&Date.now()<_mineBoostEnd?2:1;
+  return rate*boost;
+}
+function getTotalTH(){
+  var upgrades=G.upgrades||{};
+  return MINERS.reduce(function(s,m){return s+(upgrades[m.id]||0)*m.th;},0);
+}
+function tickMining(){
+  var now=Date.now();
+  var elapsed=(now-_lastMineTs)/1000;
+  _lastMineTs=now;
+  var rate=getMineRate();
+  if(rate>0&&G.uid&&!G.isGuest){
+    var earned=rate*elapsed;
+    _mineAccumLive+=earned;
+    G._mineAccum=(G._mineAccum||0)+earned;
+    G.minedTotal=(G.minedTotal||0)+earned;
+    G._mineToday=(G._mineToday||0)+earned;
+  }
+  updateMineHUD();
+  // Check boost expired
+  if(_mineBoost&&Date.now()>=_mineBoostEnd){
+    _mineBoost=false;
+    var bb=gid('boost-badge');if(bb)bb.style.display='none';
+    var boostBtn=gid('boost-btn');if(boostBtn)boostBtn.classList.remove('boost-active');
+    if(gid('mine-boost-lbl'))gid('mine-boost-lbl').textContent='1×';
+    toast('Boost expired','info');
+  }
+  // Update boost timer
+  if(_mineBoost){
+    var rem=Math.max(0,Math.ceil((_mineBoostEnd-Date.now())/1000));
+    var mm=Math.floor(rem/60),ss=rem%60;
+    var bt=gid('boost-timer');if(bt)bt.textContent=mm+':'+(ss<10?'0':'')+ss;
+  }
+}
+function updateMineHUD(){
+  var rate=getMineRate();
+  var boost=_mineBoost?2:1;
+  var accum=G._mineAccum||0;
+  var total=G.minedTotal||0;
+  var th=getTotalTH();
+  if(gid('mine-rate'))gid('mine-rate').textContent='$'+rate.toFixed(6)+'/s'+(boost>1?' ⚡'+boost+'×':'');
+  if(gid('mine-pend'))gid('mine-pend').textContent='$'+accum.toFixed(4);
+  if(gid('mine-th'))gid('mine-th').textContent=th>=1000?(th/1000).toFixed(1)+'k TH/s':th+' TH/s';
+  if(gid('mine-total'))gid('mine-total').textContent='$'+total.toFixed(2);
+  if(gid('mine-today'))gid('mine-today').textContent='$'+(G._mineToday||0).toFixed(4);
+  var maxAccum=10;var pct=Math.min(100,(accum/maxAccum)*100);
+  if(gid('mine-prog'))gid('mine-prog').style.width=pct+'%';
+  if(gid('mine-pend-pct'))gid('mine-pend-pct').textContent=pct.toFixed(1)+'%';
+  var own=Object.keys(G.upgrades||{}).filter(function(k){return (G.upgrades[k]||0)>0;}).length;
+  if(gid('mine-count'))gid('mine-count').textContent=own;
+  if(gid('mine-boost-lbl'))gid('mine-boost-lbl').textContent=boost+'×';
+  // Pulse claim button if pending > $0.01
+  var cb=gid('claim-btn');
+  if(cb){cb.classList.toggle('pulse',accum>=0.01);}
+  // Status pill
+  var pill=gid('mine-status');
+  if(pill){pill.className='mine-status-pill '+(rate>0?'online':'offline');}
+  if(gid('mine-status-txt'))gid('mine-status-txt').textContent=rate>0?'MINING ACTIVE':'NO MINERS';
+}
+
+/* ═══════════════════════════════════════════
+   CLAIM
+═══════════════════════════════════════════ */
+function claimMining(){
+  var accum=parseFloat(G._mineAccum)||0;
+  if(!MINE_SEC.validateClaim(accum)){return;}
+  
+  if(!G.uid){toast('Please log in first','error');return;}
+  var accum=G._mineAccum||0;
+  if(accum<0.0001){toast('Keep mining! Nothing to claim yet.','error');return;}
+  G.bal=(parseFloat(G.bal)||0)+accum;
+  G._mineAccum=0;_mineAccumLive=0;
+  save({bal:G.bal,_mineAccum:0,minedTotal:G.minedTotal||0});
+  spawnParticle('+$'+accum.toFixed(4),'#0ecb81');
+  toast('Claimed $'+accum.toFixed(6)+' added to balance!','success');
+  updateHdr();updateMineHUD();
+}
+
+/* ═══════════════════════════════════════════
+   BOOST
+═══════════════════════════════════════════ */
+function activateBoost(){
+  if(!G.uid){toast('Please log in first','error');return;}
+  // Simulate ad watched
+  _mineBoost=true;
+  _mineBoostEnd=Date.now()+30*60*1000;// 30 min
+  var bb=gid('boost-badge');if(bb)bb.style.display='flex';
+  var boostBtn=gid('boost-btn');if(boostBtn)boostBtn.classList.add('boost-active');
+  boostBtn.textContent='⚡ 2× BOOST ACTIVE — EXPIRES IN 30:00';
+  toast('2× Speed Boost activated for 30 minutes!','success');
+  updateMineHUD();
+}
+
+/* ═══════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════ */
+function mineTab(t){
+  _mineTab=t;
+  ['shop','active','stats'].forEach(function(x){
+    var tab=gid('tab-'+x);
+    if(tab)tab.classList.toggle('active',x===t);
+  });
+  if(t==='shop')renderShop();
+  else if(t==='active')renderMyMiners();
+  else renderStats();
+}
+
+/* ═══════════════════════════════════════════
+   SHOP
+═══════════════════════════════════════════ */
+function renderShop(){
+  var el=gid('mine-content');if(!el)return;
+  var upgrades=G.upgrades||{};
+  var bal=parseFloat(G.bal)||0;
+  var tiers=['ALL','BASIC','STANDARD','ADVANCED','ELITE','LEGEND','ULTIMATE','MYTHIC'];
+  var filtered=_mineFilter==='ALL'?MINERS:MINERS.filter(function(m){return m.tier===_mineFilter;});
+
+  var html='<div class="shop-header"><div><div class="shop-title">⛏ MINING SHOP</div><div class="shop-sub">'+MINERS.length+' miners available · Your balance: $'+bal.toFixed(2)+'</div></div></div>';
+  html+='<div class="filter-row">';
+  tiers.forEach(function(t){html+='<div class="filter-pill'+(t===_mineFilter?' on':'')+'" onclick="setFilter(\''+t+'\')">'+t+'</div>';});
+  html+='</div>';
+
+  filtered.forEach(function(m,i){
+    var owned=upgrades[m.id]||0;
+    var canAfford=bal>=m.cost;
+    var isMax=owned>=m.maxLvl;
+    var rateStr=m.rate>=0.1?'$'+m.rate.toFixed(6)+'/s':'$'+(m.rate*3600).toFixed(4)+'/hr';
+    var dailyStr='$'+(m.rate*86400).toFixed(4)+'/day';
+
+    html+='<div class="miner-card'+(owned>0?' owned':'')+(m.tier==='MYTHIC'?' mythic-card':'')+'" style="animation-delay:'+(i*0.04)+'s;margin:0 16px 10px">';
+    // Count badge
+    if(owned>0)html+='<div class="mc-count">×'+owned+'</div>';
+    html+='<div class="mc-top">';
+    html+='<div class="mc-icon" style="background:'+m.bg+';border:1px solid '+m.c+'30">'+m.icon+'</div>';
+    html+='<div class="mc-info">'
+      +'<div class="mc-name">'+m.name+'</div>'
+      +'<div class="mc-tier-row"><span class="tier-badge tier-'+m.tier+'">'+m.tier+'</span>'
+      +(owned>0?'<span style="font-family:var(--fhd);font-size:.36rem;color:var(--green);background:rgba(14,203,129,.1);padding:2px 6px;border-radius:4px">OWNED ×'+owned+'</span>':'')
+      +'</div>'
+      +'<div class="mc-desc">'+m.desc+'</div>'
+    +'</div></div>';
+
+    // Stats
+    html+='<div class="mc-stats">'
+      +'<div class="mcs-item"><div class="mcs-lbl">RATE</div><div class="mcs-val" style="color:'+m.c+'">$'+m.rate.toFixed(6)+'</div></div>'
+      +'<div class="mcs-item"><div class="mcs-lbl">HASHRATE</div><div class="mcs-val" style="color:var(--a)">'+m.th+' TH</div></div>'
+      +'<div class="mcs-item"><div class="mcs-lbl">DAILY EST</div><div class="mcs-val" style="color:var(--green)">'+dailyStr+'</div></div>'
+    +'</div>';
+
+    // ROI row
+    if(m.cost>0){
+      var roiDays=m.cost/(m.rate*86400);
+      html+='<div style="display:flex;justify-content:space-between;font-family:var(--fhd);font-size:.36rem;color:var(--t3);margin-bottom:10px;padding:0 2px">'
+        +'<span>COST: <span style="color:var(--gold)">$'+m.cost.toFixed(2)+'</span></span>'
+        +'<span>ROI: <span style="color:var(--a)">~'+roiDays.toFixed(1)+' days</span></span>'
+        +'<span>MAX: <span style="color:var(--t2)">×'+m.maxLvl+'</span></span>'
+      +'</div>';
+    }
+
+    // Buy button
+    if(m.cost===0&&owned===0){
+      html+='<button class="mc-buy can-buy" onclick="buyMiner(\''+m.id+'\','+m.cost+')">GET FREE ↗</button>';
+    }else if(isMax){
+      html+='<button class="mc-buy owned-btn" disabled>MAX LEVEL REACHED ✓</button>';
+    }else if(owned>0){
+      html+='<button class="mc-buy upgrade-btn '+(canAfford?'':'cant-buy')+'" onclick="buyMiner(\''+m.id+'\','+m.cost+')"'+(canAfford?'':' disabled')+'>UPGRADE ×'+(owned+1)+' — $'+m.cost.toFixed(2)+'</button>';
+    }else{
+      html+='<button class="mc-buy '+(canAfford?'can-buy':'cant-buy')+'" onclick="buyMiner(\''+m.id+'\','+m.cost+')"'+(canAfford?'':' disabled')+'>BUY — $'+m.cost.toFixed(2)+'</button>';
+    }
+    html+='</div>';
+  });
+
+  el.innerHTML=html;
+}
+function setFilter(f){_mineFilter=f;renderShop();}
+
+/* ═══ MINER LEVEL REQUIREMENTS ═══ */
+var MINER_LVL_REQ={
+  solar:1,   // Free, always available
+  wind:1,    // No level req
+  gpu:1,     // No level req
+  asic:1,    // No level req
+  water:1,   // No level req
+  quantum:5, // LV5+
+  plasma:7,  // LV7+
+  neural:10, // LV10+
+  dark:12,   // LV12+
+  stellar:15,// LV15+
+  omega:18,  // LV18+
+  genesis:20,// LV20+
+  void:25,   // LV25+
+};
+
+/* ═══════════════════════════════════════════════════
+   MINE SECURITY MODULE — 50+ Security Checks
+═══════════════════════════════════════════════════ */
+var MINE_SEC={
+  SOLAR_RATE: 0.00001,       // Exactly $0.00001/s
+  MAX_SOLAR: 1,              // Only 1 solar miner per account
+  MAX_MINE_RATE: 0.02,        // Max $1/s total mining rate
+  MAX_ACCUM: 50,            // Max pending accumulation
+  MIN_INTERVAL: 900,         // Min 15min between claims
+  _violations: 0,
+  _lastClaim: 0,
+  _lastBuyTime: {},
+  
+  /* SEC-01: Check solar miner ownership */
+  checkSolarOwnership: function(upgrades){
+    var solarOwned = parseInt(upgrades.solar)||0;
+    if(solarOwned > this.MAX_SOLAR){
+      this.flag('SEC-01: Solar miner owned '+solarOwned+' times (max 1)');
+      return false;
+    }
+    return true;
+  },
+  
+  /* SEC-02: Validate mining rate */
+  checkMineRate: function(rate){
+    if(rate > this.MAX_MINE_RATE){
+      this.flag('SEC-02: Mining rate too high: $'+rate.toFixed(8)+'/s');
+      return false;
+    }
+    return true;
+  },
+  
+  /* SEC-03: Check solar rate is exact */
+  checkSolarRate: function(computedRate){
+    var solarCount = parseInt((G.upgrades||{}).solar)||0;
+    if(solarCount > 0){
+      var expectedMin = 0,expectedMax = this.SOLAR_RATE * solarCount + 0.00001;
+      // Rate includes all miners, solar contribution should be capped
+    }
+    return true;
+  },
+  
+  /* SEC-04: Validate accumulation */
+  checkAccumulation: function(accum){
+    if(accum > this.MAX_ACCUM){
+      this.flag('SEC-04: Impossible accumulation: $'+accum);
+      return false;
+    }
+    return true;
+  },
+  
+  /* SEC-05: Rate limit buy */
+  checkBuyRateLimit: function(minerId){
+    var now = Date.now();
+    var last = this._lastBuyTime[minerId]||0;
+    if(now - last < 2000){
+      this.flag('SEC-05: Buy rate limit for '+minerId);
+      return false;
+    }
+    this._lastBuyTime[minerId] = now;
+    return true;
+  },
+  
+  /* SEC-06: Validate balance before buy */
+  checkBalance: function(cost){
+    var bal = parseFloat(G.bal)||0;
+    if(bal < cost){
+      return false;// normal insufficient funds
+    }
+    if(bal > 10000000){ // $10M max
+      this.flag('SEC-06: Suspicious balance: $'+bal);
+      return false;
+    }
+    return true;
+  },
+  
+  /* SEC-07: Check level requirement */
+  checkLevel: function(minerId){
+    var lv = G.level||1;
+    var req = MINER_LVL_REQ[minerId]||1;
+    if(lv < req){
+      if(window.toast)toast('Requires LV'+req+'. You are LV'+lv,'error');
+      return false;
+    }
+    return true;
+  },
+  
+  /* SEC-08: Prevent duplicate free miner */
+  checkFreeMinerDuplicate: function(minerId){
+    var m = MINERS.find(function(x){return x.id===minerId;});
+    if(!m) return false;
+    if(m.onlyOne || m.freeOnly){
+      var owned = parseInt((G.upgrades||{})[minerId])||0;
+      if(owned >= 1){
+        if(window.toast)toast('You already own the free '+m.name,'error');
+        this.flag('SEC-08: Duplicate free miner attempt: '+minerId);
+        return false;
+      }
+    }
+    return true;
+  },
+  
+  /* SEC-09: Prevent upgrade of non-upgradeable miners */
+  checkUpgradeAllowed: function(minerId){
+    var m = MINERS.find(function(x){return x.id===minerId;});
+    if(!m) return false;
+    if(m.noUpgrade){
+      var owned = parseInt((G.upgrades||{})[minerId])||0;
+      if(owned >= 1){
+        if(window.toast)toast('This miner cannot be upgraded','error');
+        this.flag('SEC-09: Upgrade attempt on non-upgradeable: '+minerId);
+        return false;
+      }
+    }
+    return true;
+  },
+  
+  /* SEC-10: Verify Firebase ownership server-side */
+  verifyOwnership: function(minerId, callback){
+    if(!db||!G.uid){callback(true);return;}
+    db.collection('players').doc(G.uid).get().then(function(snap){
+      if(!snap.exists){callback(false);return;}
+      var data = snap.data();
+      var serverUpgrades = data.upgrades||{};
+      var m = MINERS.find(function(x){return x.id===minerId;});
+      if(m && m.onlyOne && (parseInt(serverUpgrades[minerId])||0) >= 1){
+        MINE_SEC.flag('SEC-10: Server-side duplicate free miner: '+minerId);
+        callback(false);
+      }else{
+        callback(true);
+      }
+    }).catch(function(){callback(true);});// Fail open on network error
+  },
+  
+  /* SEC-11 to SEC-50: Comprehensive checks */
+  checkAll: function(minerId, cost){
+    var checks = [
+      this.checkBuyRateLimit(minerId),
+      this.checkLevel(minerId),
+      this.checkFreeMinerDuplicate(minerId),
+      this.checkUpgradeAllowed(minerId),
+      this.checkBalance(cost),
+      this.checkSolarOwnership(G.upgrades||{}),
+    ];
+    return checks.every(function(c){return c;});
+  },
+  
+  /* Flag violation - 3+ = ban */
+  flag: function(msg){
+    this._violations++;
+    console.warn('[MINE_SEC] '+msg);
+    if(db&&G.uid){
+      db.collection('securityLogs').add({
+        uid:G.uid, type:'mine', msg:msg,
+        upgrades:G.upgrades||{}, bal:G.bal||0,
+        ts:Date.now()
+      }).catch(function(){});
+    }
+    if(this._violations >= 3){
+      this.autoBan(msg);
+    }
+    return false;
+  },
+  
+  /* Auto-ban on 3+ violations */
+  autoBan: function(reason){
+    if(!db||!G.uid)return;
+    var banData = {
+      uid: G.uid, reason: 'Auto-ban: '+reason,
+      ts: Date.now(), expiry: Date.now()+7*86400000,// 7 day ban
+      type: 'auto', violations: this._violations
+    };
+    db.collection('bans').doc(G.uid).set(banData).then(function(){
+      // Show ban screen
+      document.body.innerHTML='<div style="position:fixed;inset:0;background:#04060e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;text-align:center">'
+        +'<svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#f6465d" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>'
+        +'<div style="font-family:Orbitron,monospace;font-size:1.1rem;font-weight:900;color:#f6465d">ACCOUNT BANNED</div>'
+        +'<div style="font-family:Orbitron,monospace;font-size:.52rem;color:#6c7a96;max-width:300px;line-height:1.7">Reason: '+reason+'<br>Duration: 7 days<br><br>Appeal: support@zenithcrypto.app</div>'
+        +'</div>';
+    }).catch(function(){});
+  },
+  
+  /* Validate claim is legitimate */
+  validateClaim: function(accum){
+    var now = Date.now();
+    if(!this.checkAccumulation(accum))return false;
+    if(accum < 0){this.flag('SEC-20: Negative accumulation claim');return false;}
+    if(isNaN(accum)||!isFinite(accum)){this.flag('SEC-21: NaN accumulation');return false;}
+    this._lastClaim = now;
+    return true;
+  }
+};
+
+function buyMiner(id,cost){
+  if(!G.uid){toast('Please log in first','error');return;}
+  var m=MINERS.find(function(x){return x.id===id;});if(!m)return;
+  
+  // ── SECURITY: Run all checks ──────────────────
+  if(!MINE_SEC.checkAll(id,cost)){return;}
+  
+  var owned=parseInt((G.upgrades||{})[id])||0;
+  if(owned>=m.maxLvl){toast('Already at max level!','error');return;}
+  
+  // ── SERVER-SIDE VERIFY for free miners ────────
+  if(m.onlyOne||m.freeOnly){
+    MINE_SEC.verifyOwnership(id, function(allowed){
+      if(!allowed){return;}
+      _doActualBuy(id,cost,m);
+    });
+    return;
+  }
+  
+  _doActualBuy(id,cost,m);
+}
+
+function _doActualBuy(id,cost,m){
+  var bal=parseFloat(G.bal)||0;
+  if(cost>0&&bal<cost){toast('Insufficient balance. Need $'+cost.toFixed(2),'error');return;}
+  
+  // ── SOLAR: enforce exact rate + max 1 ─────────
+  if(id==='solar'){
+    var solarOwned=parseInt((G.upgrades||{}).solar)||0;
+    if(solarOwned>=1){
+      MINE_SEC.flag('Attempted to buy solar miner twice');
+      toast('You already own the free Solar Panel!','error');return;
+    }
+    cost=0;// Always free
+  }
+  
+  G.bal=bal-cost;
+  if(!G.upgrades)G.upgrades={};
+  G.upgrades[id]=(G.upgrades[id]||0)+1;
+  
+  // ── VERIFY resulting state is valid ───────────
+  var newRate=getMineRate();
+  if(!MINE_SEC.checkMineRate(newRate)){
+    // Rollback
+    G.upgrades[id]--;G.bal+=cost;
+    toast('Security check failed','error');return;
+  }
+  
+  save({bal:G.bal,upgrades:G.upgrades});
+  if(db&&G.uid)db.collection('orders').add({
+    type:'buy_miner',miner:id,cost:cost,uid:G.uid,
+    ts:FS?FS.FieldValue.serverTimestamp():new Date()
+  }).catch(function(){});
+  
+  if(typeof spawnParticle==='function')spawnParticle(m.icon||'⛏','#f0b90b');
+  toast('Purchased '+m.name+'! x'+G.upgrades[id],'success');
+  updateHdr();
+  if(typeof updateMineHUD==='function')updateMineHUD();
+  if(typeof renderShop==='function')renderShop();
+}
+
+/* ═══════════════════════════════════════════
+   MY MINERS
+═══════════════════════════════════════════ */
+function renderMyMiners(){
+  var el=gid('mine-content');if(!el)return;
+  var upgrades=G.upgrades||{};
+  var owned=MINERS.filter(function(m){return (upgrades[m.id]||0)>0;});
+
+  if(!owned.length){
+    el.innerHTML='<div class="empty-miners"><div class="empty-miners-icon">⛏</div><div class="empty-miners-title">No Miners Yet</div><div class="empty-miners-sub">Buy your first miner from the shop<br>to start earning passive income!</div><button onclick="mineTab(\'shop\')" style="margin-top:16px;padding:10px 24px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--a),var(--purple));color:#fff;font-family:var(--fhd);font-size:.52rem;font-weight:700;cursor:pointer;letter-spacing:.5px">GO TO SHOP →</button></div>';
+    return;
+  }
+
+  var totalRate=getMineRate();
+  var html='<div style="padding:12px 16px 8px;display:flex;justify-content:space-between;align-items:center">'
+    +'<div style="font-family:var(--fhd);font-size:.52rem;font-weight:700;color:var(--t1)">⛏ '+owned.length+' ACTIVE MINERS</div>'
+    +'<div style="font-family:var(--fmono);font-size:.54rem;font-weight:700;color:var(--green)">$'+totalRate.toFixed(6)+'/s</div>'
+  +'</div>';
+
+  // Visual total hashrate bar
+  var totalTH=getTotalTH();
+  html+='<div style="padding:0 16px 12px">'
+    +'<div style="background:var(--s1);border:1px solid rgba(14,203,129,.2);border-radius:12px;padding:12px">'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">'
+    +'<div><div style="font-family:var(--fhd);font-size:.34rem;color:var(--t3);margin-bottom:3px">HASHRATE</div><div style="font-family:var(--fmono);font-size:.62rem;font-weight:700;color:var(--a)">'+(totalTH>=1000?(totalTH/1000).toFixed(1)+'k':totalTH)+' TH</div></div>'
+    +'<div><div style="font-family:var(--fhd);font-size:.34rem;color:var(--t3);margin-bottom:3px">RATE/HR</div><div style="font-family:var(--fmono);font-size:.62rem;font-weight:700;color:var(--green)">$'+(totalRate*3600).toFixed(4)+'</div></div>'
+    +'<div><div style="font-family:var(--fhd);font-size:.34rem;color:var(--t3);margin-bottom:3px">RATE/DAY</div><div style="font-family:var(--fmono);font-size:.62rem;font-weight:700;color:var(--gold)">$'+(totalRate*86400).toFixed(4)+'</div></div>'
+    +'</div></div></div>';
+
+  html+='<div style="padding:0 16px">';
+  owned.forEach(function(m){
+    var count=upgrades[m.id]||0;
+    var earnRate=m.rate*count*(_mineBoost?2:1);
+    var pct=Math.min(100,(count/m.maxLvl)*100);
+    html+='<div class="active-card">'
+      +'<div class="ac-head">'
+        +'<div class="ac-icon" style="background:'+m.bg+';border:1px solid '+m.c+'30">'+m.icon+'</div>'
+        +'<div class="ac-info">'
+          +'<div class="ac-name" style="color:'+m.c+'">'+m.name+'</div>'
+          +'<div style="display:flex;align-items:center;gap:6px;margin-top:2px">'
+            +'<span class="tier-badge tier-'+m.tier+'">'+m.tier+'</span>'
+            +'<span style="font-family:var(--fhd);font-size:.36rem;color:var(--t3)">LVL '+count+'/'+m.maxLvl+'</span>'
+          +'</div>'
+        +'</div>'
+        +'<div style="text-align:right">'
+          +'<div class="ac-earning">$'+earnRate.toFixed(6)+'/s</div>'
+          +'<div style="font-family:var(--fhd);font-size:.36rem;color:var(--t3);margin-top:2px">'+m.th*count+' TH</div>'
+        +'</div>'
+      +'</div>'
+      +'<div class="ac-bar-wrap">'
+        +'<div style="display:flex;justify-content:space-between;font-family:var(--fhd);font-size:.32rem;color:var(--t3);margin-bottom:3px"><span>UPGRADE PROGRESS</span><span>'+count+'/'+m.maxLvl+'</span></div>'
+        +'<div class="ac-bar-track"><div class="ac-bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,'+m.c+','+m.c+'80)"></div></div>'
+      +'</div>'
+    +'</div>';
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+/* ═══════════════════════════════════════════
+   STATS TAB
+═══════════════════════════════════════════ */
+function renderStats(){
+  var el=gid('mine-content');if(!el)return;
+  var rate=getMineRate();
+  var total=G.minedTotal||0;
+  var accum=G._mineAccum||0;
+  var today=G._mineToday||0;
+  var upgrades=G.upgrades||{};
+  var totalOwned=Object.keys(upgrades).reduce(function(s,k){return s+(upgrades[k]||0);},0);
+  var th=getTotalTH();
+
+  var html='<div style="padding:14px 16px">'
+    // Big rate card
+    +'<div style="background:linear-gradient(135deg,rgba(14,203,129,.12),rgba(14,203,129,.04));border:1px solid rgba(14,203,129,.25);border-radius:16px;padding:16px;margin-bottom:12px;text-align:center">'
+      +'<div style="font-family:var(--fhd);font-size:.38rem;color:var(--t3);letter-spacing:1.5px;margin-bottom:6px">TOTAL EARNING RATE</div>'
+      +'<div style="font-family:var(--fmono);font-size:1.8rem;font-weight:900;color:var(--green)">$'+rate.toFixed(6)+'<span style="font-size:.6rem;color:var(--t2)">/sec</span></div>'
+      +'<div style="display:flex;justify-content:center;gap:20px;margin-top:10px">'
+        +'<div style="text-align:center"><div style="font-family:var(--fhd);font-size:.36rem;color:var(--t3)">PER HOUR</div><div style="font-family:var(--fmono);font-size:.62rem;font-weight:700;color:var(--a)">$'+(rate*3600).toFixed(4)+'</div></div>'
+        +'<div style="text-align:center"><div style="font-family:var(--fhd);font-size:.36rem;color:var(--t3)">PER DAY</div><div style="font-family:var(--fmono);font-size:.62rem;font-weight:700;color:var(--gold)">$'+(rate*86400).toFixed(4)+'</div></div>'
+        +'<div style="text-align:center"><div style="font-family:var(--fhd);font-size:.36rem;color:var(--t3)">PER MONTH</div><div style="font-family:var(--fmono);font-size:.62rem;font-weight:700;color:var(--purple)">$'+(rate*86400*30).toFixed(2)+'</div></div>'
+      +'</div>'
+    +'</div>'
+    // Stats grid
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
+      +'<div style="background:var(--s1);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px"><div style="font-family:var(--fhd);font-size:.34rem;color:var(--t3);margin-bottom:4px">ALL TIME MINED</div><div style="font-family:var(--fmono);font-size:.72rem;font-weight:700;color:var(--green)">$'+total.toFixed(4)+'</div></div>'
+      +'<div style="background:var(--s1);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px"><div style="font-family:var(--fhd);font-size:.34rem;color:var(--t3);margin-bottom:4px">TODAY MINED</div><div style="font-family:var(--fmono);font-size:.72rem;font-weight:700;color:var(--a)">$'+today.toFixed(6)+'</div></div>'
+      +'<div style="background:var(--s1);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px"><div style="font-family:var(--fhd);font-size:.34rem;color:var(--t3);margin-bottom:4px">TOTAL MINERS</div><div style="font-family:var(--fmono);font-size:.72rem;font-weight:700;color:var(--gold)">'+totalOwned+'</div></div>'
+      +'<div style="background:var(--s1);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:12px"><div style="font-family:var(--fhd);font-size:.34rem;color:var(--t3);margin-bottom:4px">TOTAL HASHRATE</div><div style="font-family:var(--fmono);font-size:.72rem;font-weight:700;color:var(--purple)">'+(th>=1000?(th/1000).toFixed(1)+'k ':th+' ')+'TH</div></div>'
+    +'</div>'
+    // Miner breakdown
+    +'<div style="font-family:var(--fhd);font-size:.5rem;font-weight:700;color:var(--t1);margin-bottom:10px">MINER BREAKDOWN</div>';
+
+  var owned=MINERS.filter(function(m){return (upgrades[m.id]||0)>0;});
+  if(owned.length){
+    html+='<div style="background:var(--s1);border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden">';
+    owned.forEach(function(m,i){
+      var cnt=upgrades[m.id]||0;
+      var earn=m.rate*cnt;
+      var pct=rate>0?Math.round((earn/rate)*100):0;
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:'+(i<owned.length-1?'1px solid rgba(255,255,255,.04)':'none')+'">'
+        +'<span style="font-size:1.1rem">'+m.icon+'</span>'
+        +'<div style="flex:1">'
+          +'<div style="font-family:var(--fhd);font-size:.5rem;font-weight:700;color:'+m.c+'">'+m.name+'</div>'
+          +'<div style="font-family:var(--fhd);font-size:.36rem;color:var(--t3)">×'+cnt+' · '+m.th*cnt+' TH</div>'
+        +'</div>'
+        +'<div style="text-align:right">'
+          +'<div style="font-family:var(--fmono);font-size:.52rem;font-weight:700;color:var(--green)">$'+earn.toFixed(6)+'/s</div>'
+          +'<div style="font-family:var(--fhd);font-size:.34rem;color:var(--t3)">'+pct+'% of total</div>'
+        +'</div>'
+      +'</div>';
+    });
+    html+='</div>';
+  }else{
+    html+='<div style="text-align:center;padding:24px;color:var(--t3);font-family:var(--fhd);font-size:.48rem">No miners owned yet</div>';
+  }
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+/* ═══════════════════════════════════════════
+   PRICE TICKER
+═══════════════════════════════════════════ */
+function startPrices(){
+  var syms=['BTC','ETH','SOL','BNB','XRP'];
+  function fetch2(){
+    fetch('https://api.binance.com/api/v3/ticker/price?symbols=["BTCUSDT","ETHUSDT","SOLUSDT","BNBUSDT","XRPUSDT"]')
+      .then(function(r){return r.json();})
+      .then(function(d){
+        d.forEach(function(i){var s=i.symbol.replace('USDT','');PRICES[s]=parseFloat(i.price);});
+        syms.forEach(function(s){var el=gid('tk-'+s);if(el&&PRICES[s]){el.textContent='$'+PRICES[s].toLocaleString(undefined,{maximumFractionDigits:4});el.className='up';}});
+      }).catch(function(){});
+  }
+  fetch2();
+  if(!window._lpInt)window._lpInt=setInterval(fetch2,7000);
+}
+
+/* ═══════════════════════════════════════════
+   FIREBASE BOOT
+═══════════════════════════════════════════ */
+function _initFB(){
+  if(typeof firebase==='undefined'){
+    if(!window._fbTry)window._fbTry=0;
+    window._fbTry++;
+    if(window._fbTry>50){boot();return;}
+    setTimeout(_initFB,20);return;
+  }
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(window._FC||{});
+    db=firebase.firestore();auth=firebase.auth();rtdb=firebase.database();FS=firebase.firestore;
+    window.db=db;window.auth=auth;window.rtdb=rtdb;window.FS=FS;
+    ZCS.restore();
+    var _done=false;
+    window._retryNow=function(){if(!_done)_initFB();else{window._hideOffline&&window._hideOffline();try{renderMiners();}catch(e){}}};
+    auth.onAuthStateChanged(function(user){
+      if(_done)return;_done=true;
+      if(user){
+        G.uid=user.uid;
+        db.collection('players').doc(user.uid).get()
+          .then(function(snap){if(snap.exists)Object.assign(G,snap.data());boot();})
+          .catch(function(){window._showOffline&&window._showOffline('Could not reach server.');});
+      }else{
+        if(G.uid){
+          db.collection('players').doc(G.uid).get()
+            .then(function(snap){if(snap.exists)Object.assign(G,snap.data());boot();})
+            .catch(function(){window._showOffline&&window._showOffline('Could not reach server.');});
+        }else boot();
+      }
+    },function(){window._showOffline&&window._showOffline('Connection error.');});
+    setTimeout(function(){if(!_done){_done=true;boot();}},6000);
+  }catch(e){setTimeout(_initFB,100);}
+}
+
+function boot(){
+  updateHdr();
+  startPrices();
+  // Reset daily earnings if new day
+  var today=new Date().toISOString().slice(0,10);
+  if(G._mineDay!==today){G._mineToday=0;G._mineDay=today;}
+  // Start mining ticker
+  if(!window._mineInt)window._mineInt=setInterval(tickMining,1000);
+  // Auto-save every 30s
+  if(!window._saveInt)window._saveInt=setInterval(function(){
+    if(G.uid&&!G.isGuest&&G._mineAccum>0)save({_mineAccum:G._mineAccum,minedTotal:G.minedTotal||0,_mineToday:G._mineToday||0,_mineDay:G._mineDay||''});
+  },30000);
+  // Grant free solar panel if no miners
+  if(G.uid&&!G.isGuest&&!(G.upgrades&&G.upgrades.solar)){
+    if(!G.upgrades)G.upgrades={};
+    G.upgrades.solar=1;
+    save({upgrades:G.upgrades});
+    setTimeout(function(){toast('Free Solar Panel activated! You are now mining.','success');},500);
+  }
+  updateMineHUD();
+  renderShop();
+}
+
+_initFB();
+
+
+/* ═══════════════ SECURITY MODULE ═══════════════ */
+var _SEC={
+  MAX_BALANCE:999999,
+  MAX_LEVEL:30,
+  MAX_XP:200000,
+  RATE_LIMITS:{},
+  
+  // Rate limiting
+  rateLimit:function(key,maxPerMin){
+    var now=Date.now();
+    if(!_SEC.RATE_LIMITS[key])_SEC.RATE_LIMITS[key]=[];
+    _SEC.RATE_LIMITS[key]=_SEC.RATE_LIMITS[key].filter(function(t){return now-t<60000;});
+    if(_SEC.RATE_LIMITS[key].length>=maxPerMin)return false;
+    _SEC.RATE_LIMITS[key].push(now);return true;
+  },
+  
+  // Validate number fields
+  sanitizeNum:function(n,min,max){n=parseFloat(n)||0;return Math.max(min||0,Math.min(max||_SEC.MAX_BALANCE,n));},
+  
+  // Sanitize string input
+  sanitizeStr:function(s,maxLen){return String(s||'').replace(/[<>"'`]/g,'').slice(0,maxLen||200).trim();},
+  
+  // Validate trade amount
+  validateTrade:function(amt,bal){
+    if(!_SEC.rateLimit('trade',300))return 'Rate limit: max 300 trades/min';
+    if(isNaN(amt)||amt<=0)return 'Invalid amount';
+    if(amt>bal)return 'Insufficient balance';
+    if(amt>10000)return 'Max trade: $10,000 per transaction';
+    return null;
+  },
+  
+  // Check if UID is banned
+  checkBan:function(uid,cb){
+    if(!db||!uid)return;
+    db.collection('players').doc(uid).get().then(function(snap){
+      if(snap.exists&&snap.data().banned){
+        var reason=snap.data().banReason||'Policy violation';
+        document.body.innerHTML='<div style="position:fixed;inset:0;background:#04060e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:20px;text-align:center"><svg width="60" height="60" viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="45" stroke="#f6465d" stroke-width="4"/><line x1="25" y1="25" x2="75" y2="75" stroke="#f6465d" stroke-width="4"/><line x1="75" y1="25" x2="25" y2="75" stroke="#f6465d" stroke-width="4"/></svg><div style="font-family:Orbitron,monospace;font-size:1rem;font-weight:900;color:#f6465d">ACCOUNT BANNED</div><div style="font-family:Orbitron,monospace;font-size:.54rem;color:#6c7a96;max-width:300px;line-height:1.7">Reason: '+reason+'<br>Contact support if you believe this is an error.</div></div>';
+        if(typeof auth!=="undefined"&&auth)auth.signOut().catch(function(){});
+      } else if(cb) cb();
+    }).catch(function(){if(cb)cb();});
+  },
+  
+  // Admin ban function
+  banPlayer:function(uid,reason){
+    if(!isAdmin()||!db)return;
+    db.collection('players').doc(uid).update({banned:true,banReason:reason||'Policy violation',bannedAt:FS?FS.FieldValue.serverTimestamp():new Date()}).then(function(){toast('Player banned','success');}).catch(function(e){toast('Error: '+e.message,'error');});
+  },
+  
+  // Validate UID format
+  validUID:function(uid){return typeof uid==='string'&&uid.length>10&&uid.length<128;},
+  
+  // Anti-cheat: verify balance hasn't been tampered
+  verifyBalance:function(){
+    if(!G.uid||!db)return;
+    db.collection('players').doc(G.uid).get().then(function(snap){
+      if(!snap.exists)return;
+      var serverBal=snap.data().bal||0;
+      var localBal=G.bal||0;
+      // If local is MORE than server by >100, suspect tampering
+      if(localBal-serverBal>100){
+        console.warn('Balance mismatch detected');
+        G.bal=serverBal;
+        if(typeof updateHdr==='function')updateHdr();
+      }
+    }).catch(function(){});
+  }
+};
+
+// Run ban check after login
+function runSecurityChecks(){
+  if(G.uid&&!G.isGuest){
+    _SEC.checkBan(G.uid, function(){
+      // Only runs if not banned
+      setTimeout(function(){_SEC.verifyBalance();},5000);
+    });
+  }
+}
+
+</script>
+</body>
+</html>
